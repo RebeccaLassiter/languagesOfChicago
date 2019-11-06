@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>World Map</title>
+  <meta charset="utf-8">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://d3js.org/topojson.v2.min.js"></script>
+  <style>
+    path {
+      fill: lightgrey;
+      stroke: #000;
+    }
+/*    .graticule {
+      fill: none;
+      stroke: #ccc;
+      stroke-width: .5px;
+    }*/
+    .foreground {
+      fill: none;
+      stroke: #333;
+      stroke-width: 1.5px;
+    }
+  </style>
+</head>
+
+<body>
+  <svg width="960" height="600"></svg>
+  <script>
+
+      var geoJson = {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "properties": {
+            "name": "Africa"
+          },
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [[[-6, 36], [33, 30], [-6, 36]]]
+          }
+        },
+        
+      ]
+    }
+    var communityAreas = "communityAreas.geoJson"
+    const svg = d3.select("svg")
+    const myProjection = d3.geoMercator()
+                            .center([-87.61240099157794,41.845166392439836])
+                            .scale( 19000 )
+
+    const path = d3.geoPath().projection(myProjection)
+    //const graticule = d3.geoGraticule()
+    function drawMap(err, dataSource) {
+      if (err) throw err
+      console.log("inside drawMap");
+      console.log(dataSource.features);
+      // svg.append("path")
+      //   //.datum(graticule)
+      //   .attr("class", "graticule")
+      //   .attr("d", path);
+      svg.append("path")
+        //.datum(graticule.outline)
+        .attr("class", "foreground")
+        .attr("d", path);
+      svg.append("g")
+        .selectAll("path")
+        //.data(topojson.feature(world, world.objects.countries).features)
+        //.data(geoJson.features)
+        .data(dataSource.features)
+        .enter().append("path")
+        .attr("d", path);
+    }
+    d3.json("communityAreas.geojson", drawMap)
+    //d3.json("https://unpkg.com/world-atlas@1.1.4/world/110m.json", drawMap)
+    
+    // FOR A MORE DETAILED MAP, USE THE BELOW JSON LINK INSTEAD:
+    // d3.json("https://unpkg.com/world-atlas@1.1.4/world/50m.json", drawMap)
+  </script>
+</body>
+
+</html>
