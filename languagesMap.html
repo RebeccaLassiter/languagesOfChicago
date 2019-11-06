@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Languages of Chicago</title>
+  <meta charset="utf-8">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+   <link rel="stylesheet" type="text/css" href="languagesMap.css">
+</head>
+
+<body>
+  <svg width="960" height="600"></svg>
+  <script>
+
+    //this div will hold the community area names on hover
+    var div = d3.select("body").append("div")
+     .attr("class", "communityName")
+     .style("opacity", 0);
+
+    const svg = d3.select("svg")
+    const myProjection = d3.geoMercator()
+                            .center([-87.5,41.85])
+                            .scale( 50000 )
+
+    //path is like our main map group
+    const path = d3.geoPath().projection(myProjection)
+                    
+    function drawMap(err, dataSource) {
+      if (err) throw err
+
+      //giving path the foreground class
+      svg.append("path")
+        .attr("class", "foreground")
+        .attr("d", path);
+      //adding a group element and assigning it the data and path
+      svg.append("g")
+        .selectAll("path")
+        .data(dataSource.features)
+        .enter().append("path")
+        .attr("d", path) 
+        //displays the community area name on hover
+        .on('mouseover', function (d, i) {
+          d3.select(this).transition()
+               .duration('50')
+               .attr('opacity', '.85');
+
+          div.transition()
+               .duration(50)
+               .style("opacity", 1);
+          //gets the community name and adds it to the div
+          name = d.properties.community;
+          div.html(name)
+               .style("left", (d3.event.pageX + 10) + "px")
+               .style("top", (d3.event.pageY - 15) + "px");
+        })
+        //removes community area name
+        .on('mouseout', function (d, i) {
+          d3.select(this).transition()
+               .duration('50')
+               .attr('opacity', '1');
+          //makes the div disappear
+          div.transition()
+               .duration('50')
+               .style("opacity", 0);
+
+        });
+    }
+    //this will call drawMap() function and give it the communityAreas data
+    d3.json("communityAreas.geojson", drawMap)
+
+
+  </script>
+</body>
+
+</html>
