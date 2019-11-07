@@ -25,14 +25,43 @@
 
     //path is like our main map group
     const path = d3.geoPath().projection(myProjection)
+
+    function calcColor(dataSet, propertyName){
+        return "red"
+    }
+
+    var color = d3.scaleQuantile()
+          .range(["rgb(237, 248, 233)", "rgb(186, 228, 179)", "rgb(116,196,118)", "rgb(49,163,84)", "rgb(0,109,44)"]);
+
+    d3.json("langAndGeography.geojson", function(data){
+                //console.log(data.features)
+                data = data.features
+                //console.log(data["properties"])
+                //console.log(d3.min(data, function(d){ return d.value;}));
+                //console.log(d3.max(data, function(d){ return d.value;}));
+                color.domain([ d3.min(data, function(d){ 
+                                            nonEng = d["properties"]["Total Non-English Speakers"];
+                                            return nonEng;}),
+                               d3.max(data, function(d){ 
+                                            nonEng = d["properties"]["Total Non-English Speakers"];
+                                            return nonEng;})]);
+              });
                     
     function drawMap(err, dataSource) {
       if (err) throw err
+
 
       //giving path the foreground class
       svg.append("path")
         .attr("class", "foreground")
         .attr("d", path);
+
+      //setting up color variable
+      // var myColor = d3.scaleLinear()
+      //                 .range(["white", "blue"])
+      // color = f(t)
+      // color = d3.scaleQuantize([100, 100], "blue")
+
       //adding a group element and assigning it the data and path
       svg.append("g")
         .selectAll("path")
@@ -42,12 +71,9 @@
 
         //changes the color of each community area
         .style('fill', function(d) {
-                                      if(d.properties.community == "ROGERS PARK") {
-                                        return 'blue';
-                                      } else {
-                                        return 'green';
-                                      }
-                                    })
+                          value = d["properties"]["Total Non-English Speakers"]
+                          return color(value);})
+                          //return calcColor(d, "Total Non-English Speakers");})
 
         //displays the community area name on hover
         .on('mouseover', function (d, i) {
