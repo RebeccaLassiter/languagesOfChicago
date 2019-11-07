@@ -23,40 +23,20 @@ with open('languageAndPop.csv', newline='') as csvfile:
      	##build up the properties dict you want to add to geojson (converting row to geojson)
 		for entry in row:
      		##gets the column headers and assign them the associated row value
-			columnName = header[propertyTracker]
+			columnName = header[propertyTracker].lower()
      		#adding each column value to properties
-			propertiesToAdd[columnName] = entry
+			propertiesToAdd[columnName] = entry.lower()
 			propertyTracker += 1
 		
-     	#Convert the properties dict to a list
-		#propertiesToAddList = zip(propertiesToAdd.keys(), propertiesToAdd.values())
+
 		for communityArea in features: 
 			properties = communityArea['properties']
-			# print(properties['community'])
-			# print(row[1])
+			#find the matching community area
 			if properties['community'] == row[1].upper():
-				print('inside if')
-				#adding each property to our community area Properties field
-				# for i in range(len(propertiesToAddList)):
-				# 	properties[propertiesToAddList[i][0]] = propertiesToAddList[i][1]
+				#combine the new and old properties and reassign it
 				properties = dict(list(properties.items()) + list(propertiesToAdd.items()))
-				print(properties)
-   #       	print(', '.join(row))
+				communityArea['properties'] = properties
 
-with open('new.geojson', 'w') as f:
+with open('langAndGeography.geojson', 'w') as f:
     json.dump(features, f)
 
-
-##now print just to see 
-with open("new.geojson") as f:
-    finished = geojson.load(f)
-#print(finished)
-# featuresNew = finished['features']
-# for communityArea in featuresNew:
-# 	print(communityArea['Properties'])
-
-
-
-
-# populationCol = numpy.loadtxt("population.csv")
-# print(populationCol)
