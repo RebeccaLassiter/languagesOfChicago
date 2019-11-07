@@ -12,12 +12,6 @@
   <svg width="960" height="600"></svg>
   <script>
 
-    
-    //this div will hold the community area names on hover
-    var div = d3.select("body").append("div")
-     .attr("class", "communityName")
-     .style("opacity", 0);
-
     const svg = d3.select("svg")
     const myProjection = d3.geoMercator()
                             .center([-87.5,41.85])
@@ -25,14 +19,17 @@
 
     //path is like our main map group
     const path = d3.geoPath().projection(myProjection)
+    
+    //this div will hold the community area names on hover
+    var div = d3.select("body").append("div")
+     .attr("class", "communityName")
+     .style("opacity", 0);
 
-    function calcColor(dataSet, propertyName){
-        return "red"
-    }
+    //setting up the colors of the map
+    var color = d3.scaleLinear()
+          .range(["white", "green"])
 
-    var color = d3.scaleQuantile()
-          .range(["rgb(237, 248, 233)", "rgb(186, 228, 179)", "rgb(116,196,118)", "rgb(49,163,84)", "rgb(0,109,44)"]);
-
+    //sets color's domain based on the data point
     d3.json("langAndGeography.geojson", function(data){
                 //console.log(data.features)
                 data = data.features
@@ -72,8 +69,12 @@
         //changes the color of each community area
         .style('fill', function(d) {
                           value = d["properties"]["Total Non-English Speakers"]
-                          return color(value);})
-                          //return calcColor(d, "Total Non-English Speakers");})
+                          if(color(value) != "rgb(0, 0, 0)"){
+                            console.log("inside conditions");
+                            return color(value);
+                          }
+                          else{return "#a9a9a9"} //if the data is unavailable
+                          })
 
         //displays the community area name on hover
         .on('mouseover', function (d, i) {
