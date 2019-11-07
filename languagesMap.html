@@ -11,7 +11,7 @@
 <body>
   <svg width="960" height="600"></svg>
   <script>
-
+    var languageCategories = ["Total Non-English","AFRICAN LANGUAGES","ARABIC","ARMENIAN","CAMBODIAN (MON-KHMER)","CHINESE","CREOLE","FRENCH","GERMAN","GREEK","GUJARATI","HEBREW","HINDI","HMONG","HUNGARIAN","ITALIAN","JAPANESE","KOREAN","LAOTIAN","NAVAJO","OTHER ASIAN","OTHER INDIC","OTHER INDO EURPOEAN","OTHER NATIVE NORTH AMERICAN","OTHER PACIFIC ISLAND","OTHER SLAVIC","OTHER WEST GERMANIC","PERSIAN","POLISH","PORTUGUESE","RUSSIAN","SCANDINAVIAN","SERBO-CROATIAN","SPANISH","TAGALOG","THAI","UNSPECIFIED","URDU","VIETNAMESE","YIDDISH"]
     const svg = d3.select("svg")
     const myProjection = d3.geoMercator()
                             .center([-87.5,41.85])
@@ -114,10 +114,10 @@
       //adds all the options to the dropdown
         d3.selectAll("select")
           .selectAll("option")
-          .data(dataSource.features)
+          .data(languageCategories)
           .enter().append("option")
           .text(function(d){
-                  return d["properties"]["community"];
+                  return d;
           });
 
     }
