@@ -9,8 +9,6 @@ with open("communityAreas.geojson") as f:
 features = gj['features']
 
 
-
-
 with open('languageAndPop.csv', newline='') as csvfile:
 	languageData = csv.reader(csvfile, delimiter=',')
 	header = []
@@ -37,6 +35,8 @@ with open('languageAndPop.csv', newline='') as csvfile:
 				properties = dict(list(properties.items()) + list(propertiesToAdd.items()))
 				communityArea['properties'] = properties
 
+
+gj['features'] = features
 with open('langAndGeography.geojson', 'w') as f:
-    json.dump(features, f)
+    json.dump(gj, f)
 
