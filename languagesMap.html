@@ -19,6 +19,9 @@
 
     //path is like our main map group
     const path = d3.geoPath().projection(myProjection)
+
+    //this is the property/language we are looking at
+    var selectedProperty = "african languages";//"Total Non-English Speakers"; 
     
     //this div will hold the community area names on hover
     var div = d3.select("body").append("div")
@@ -29,22 +32,17 @@
     var color = d3.scaleLinear()
           .range(["white", "green"])
 
-    //sets color's domain based on the data point
+    //sets color's domain based on the data we are looking at
     d3.json("langAndGeography.geojson", function(data){
-                //console.log(data.features)
                 data = data.features;
-                
-                //console.log(data["properties"])
-                //console.log(d3.min(data, function(d){ return d.value;}));
-                //console.log(d3.max(data, function(d){ return d.value;}));
                 color.domain([ d3.min(data, function(d){ 
                                             pop = d["properties"]["total population"];
-                                            nonEng = d["properties"]["Total Non-English Speakers"];
-                                            return nonEng/pop;}),
+                                            total = d["properties"][selectedProperty];
+                                            return total/pop;}),
                                d3.max(data, function(d){
                                             pop = d["properties"]["total population"];
-                                            nonEng = d["properties"]["Total Non-English Speakers"];
-                                            return nonEng/pop;})]);
+                                            total = d["properties"][selectedProperty];
+                                            return total/pop;})]);
               });
                     
     function drawMap(err, dataSource) {
@@ -56,12 +54,6 @@
         .attr("class", "foreground")
         .attr("d", path);
 
-      //setting up color variable
-      // var myColor = d3.scaleLinear()
-      //                 .range(["white", "blue"])
-      // color = f(t)
-      // color = d3.scaleQuantize([100, 100], "blue")
-
       //adding a group element and assigning it the data and path
       svg.append("g")
         .selectAll("path")
@@ -71,7 +63,7 @@
 
         //changes the color of each community area
         .style('fill', function(d) {
-                          total = d["properties"]["Total Non-English Speakers"]; 
+                          total = d["properties"][selectedProperty]; 
                           pop = d["properties"]["total population"]; 
                           value = total/pop; 
                           if(color(value) != "rgb(0, 0, 0)"){
@@ -92,9 +84,13 @@
 
           //gets the community name and adds it to the div
           name = d.properties.community;
-          div.html(name)
+          total = d.properties[selectedProperty];
+          pop = d.properties["total population"]; 
+          value = total/pop; 
+          div.html(name+" " + value)
                .style("left", (d3.event.pageX + 10) + "px")
                .style("top", (d3.event.pageY - 15) + "px");
+          
         })
 
         //removes community area name
@@ -111,8 +107,6 @@
     }
     //this will call drawMap() function and give it the communityAreas data
     d3.json("langAndGeography.geojson", drawMap)
-    //d3.json("communityAreas.geojson", drawMap)
-
 
 
   </script>
