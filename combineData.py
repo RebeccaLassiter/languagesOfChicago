@@ -27,16 +27,20 @@ with open('languageAndPop.csv', newline='') as csvfile:
      		#adding each column value to properties
 			propertiesToAdd[columnName] = entry
 			propertyTracker += 1
-		print(propertiesToAdd)
+		
      	#Convert the properties dict to a list
-		propertiesToAddList = zip(propertiesToAdd.keys(), propertiesToAdd.values())
+		#propertiesToAddList = zip(propertiesToAdd.keys(), propertiesToAdd.values())
 		for communityArea in features: 
 			properties = communityArea['properties']
-			if properties['community'] == row[1]:
+			# print(properties['community'])
+			# print(row[1])
+			if properties['community'] == row[1].upper():
+				print('inside if')
 				#adding each property to our community area Properties field
-				for i in range(len(propertiesToAddList)):
-					properties[propertiesToAddList[i][0]] = propertiesToAddList[i][1]
-			# print(properties)
+				# for i in range(len(propertiesToAddList)):
+				# 	properties[propertiesToAddList[i][0]] = propertiesToAddList[i][1]
+				properties = dict(list(properties.items()) + list(propertiesToAdd.items()))
+				print(properties)
    #       	print(', '.join(row))
 
 with open('new.geojson', 'w') as f:
