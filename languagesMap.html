@@ -12,6 +12,7 @@
   <svg width="960" height="600"></svg>
   <script>
 
+    
     //this div will hold the community area names on hover
     var div = d3.select("body").append("div")
      .attr("class", "communityName")
@@ -42,7 +43,7 @@
         //changes the color of each community area
         .style('fill', function(d) {
                                       if(d.properties.community == "ROGERS PARK") {
-                                        return 'red';
+                                        return 'blue';
                                       } else {
                                         return 'green';
                                       }
