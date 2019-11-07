@@ -21,7 +21,7 @@
     const path = d3.geoPath().projection(myProjection)
 
     //this is the property/language we are looking at
-    var selectedProperty = "Total Non-English Speakers"; 
+    var selectedProperty = "yiddish";//"Total Non-English Speakers"; 
     
     //this div will hold the community area names on hover
     var div = d3.select("body").append("div")
@@ -106,6 +106,17 @@
                .style("opacity", 0);
 
         });
+      //creates the dropdown with the language options
+       d3.select("body")
+          .append("select")
+          .attr("id", "langDropdown")
+          .append("option")
+          .data(dataSource.features)
+          .text(function(d){
+
+                  return d["properties"]["community"]
+          }); 
+
     }
     //this will call drawMap() function and give it the communityAreas data
     d3.json("langAndGeography.geojson", drawMap)

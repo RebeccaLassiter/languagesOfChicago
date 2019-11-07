@@ -1,20 +1,24 @@
-    path {
-      fill: lightgrey;
-      stroke: #000;
-    }
-    .foreground {
-      fill: none;
-      stroke: #333;
-      stroke-width: 1.5px;
-    }
-    div.communityName {
-     position: absolute;
-     text-align: center;
-     padding: .5rem;
-     background: #FFFFFF;
-     color: #313639;
-     border: 1px solid #313639;
-     border-radius: 8px;
-     pointer-events: none;
-     font-size: 1.3rem;
+path {
+  fill: lightgrey;
+  stroke: #000;
 }
+.foreground {
+  fill: none;
+  stroke: #333;
+  stroke-width: 1.5px;
+}
+div.communityName {
+ position: absolute;
+ text-align: center;
+ padding: .5rem;
+ background: #FFFFFF;
+ color: #313639;
+ border: 1px solid #313639;
+ border-radius: 8px;
+ pointer-events: none;
+ font-size: 1.3rem;
+}
+
+
+select { position: absolute; left: 500px; top: 50px; }
+p { position: absolute; left: 280px; top: 32px; }
