@@ -109,13 +109,16 @@
       //creates the dropdown with the language options
        d3.select("body")
           .append("select")
-          .attr("id", "langDropdown")
-          .append("option")
+          .attr("id", "langDropdown");
+          
+      //adds all the options to the dropdown
+        d3.selectAll("select")
+          .selectAll("option")
           .data(dataSource.features)
+          .enter().append("option")
           .text(function(d){
-
-                  return d["properties"]["community"]
-          }); 
+                  return d["properties"]["community"];
+          });
 
     }
     //this will call drawMap() function and give it the communityAreas data
