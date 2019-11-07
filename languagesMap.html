@@ -32,16 +32,19 @@
     //sets color's domain based on the data point
     d3.json("langAndGeography.geojson", function(data){
                 //console.log(data.features)
-                data = data.features
+                data = data.features;
+                
                 //console.log(data["properties"])
                 //console.log(d3.min(data, function(d){ return d.value;}));
                 //console.log(d3.max(data, function(d){ return d.value;}));
                 color.domain([ d3.min(data, function(d){ 
+                                            pop = d["properties"]["total population"];
                                             nonEng = d["properties"]["Total Non-English Speakers"];
-                                            return nonEng;}),
-                               d3.max(data, function(d){ 
+                                            return nonEng/pop;}),
+                               d3.max(data, function(d){
+                                            pop = d["properties"]["total population"];
                                             nonEng = d["properties"]["Total Non-English Speakers"];
-                                            return nonEng;})]);
+                                            return nonEng/pop;})]);
               });
                     
     function drawMap(err, dataSource) {
@@ -68,9 +71,10 @@
 
         //changes the color of each community area
         .style('fill', function(d) {
-                          value = d["properties"]["Total Non-English Speakers"]
+                          total = d["properties"]["Total Non-English Speakers"]; 
+                          pop = d["properties"]["total population"]; 
+                          value = total/pop; 
                           if(color(value) != "rgb(0, 0, 0)"){
-                            console.log("inside conditions");
                             return color(value);
                           }
                           else{return "#a9a9a9"} //if the data is unavailable
