@@ -11,7 +11,7 @@
 <body>
   <svg width="960" height="600"></svg>
   <script>
-    var languageCategories = ["Total Non-English","AFRICAN LANGUAGES","ARABIC","ARMENIAN","CAMBODIAN (MON-KHMER)","CHINESE","CREOLE","FRENCH","GERMAN","GREEK","GUJARATI","HEBREW","HINDI","HMONG","HUNGARIAN","ITALIAN","JAPANESE","KOREAN","LAOTIAN","NAVAJO","OTHER ASIAN","OTHER INDIC","OTHER INDO EURPOEAN","OTHER NATIVE NORTH AMERICAN","OTHER PACIFIC ISLAND","OTHER SLAVIC","OTHER WEST GERMANIC","PERSIAN","POLISH","PORTUGUESE","RUSSIAN","SCANDINAVIAN","SERBO-CROATIAN","SPANISH","TAGALOG","THAI","UNSPECIFIED","URDU","VIETNAMESE","YIDDISH"]
+    var languageCategories = ["Total Non-English","AFRICAN LANGUAGES","ARABIC","ARMENIAN","CAMBODIAN (MON-KHMER)","CHINESE","CREOLE","FRENCH","GERMAN","GREEK","GUJARATI","HEBREW","HINDI","HMONG","HUNGARIAN","ITALIAN","JAPANESE","KOREAN","LAOTIAN","NAVAJO","OTHER ASIAN","OTHER INDIC","OTHER INDO EURPOEAN","OTHER NATIVE NORTH AMERICAN","OTHER PACIFIC ISLAND","OTHER SLAVIC","OTHER WEST GERMANIC","PERSIAN","POLISH","PORTUGUESE","RUSSIAN","SCANDINAVIAN","SERBO-CROATIAN","SPANISH","TAGALOG","THAI","UNSPECIFIED","URDU","VIETNAMESE","YIDDISH"];
     const svg = d3.select("svg")
     const myProjection = d3.geoMercator()
                             .center([-87.5,41.85])
@@ -21,7 +21,7 @@
     const path = d3.geoPath().projection(myProjection)
 
     //this is the property/language we are looking at
-    var selectedProperty = "yiddish";//"Total Non-English Speakers"; 
+    var selectedProperty = "Total Non-English Speakers"; 
     
     //this div will hold the community area names on hover
     var div = d3.select("body").append("div")
@@ -120,9 +120,25 @@
                   return d;
           });
 
+      //when users select a lang from the dropdown
+        d3.select("#langDropdown")
+          .on("change", function(d) {
+            selectedProperty = this.value;
+            updateMap();
+            });
+
     }
+    function updateMap(){
+      console.log("in update map");
+
+       svg.selectAll('path')
+       .style('fill', 'red'); 
+
+    }
+
     //this will call drawMap() function and give it the communityAreas data
     d3.json("langAndGeography.geojson", drawMap)
+  // update();
 
 
   </script>
