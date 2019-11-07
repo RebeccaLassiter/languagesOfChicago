@@ -30,7 +30,7 @@ with open('languageAndPop.csv', newline='') as csvfile:
 				totalNonEnglish += int(entry)
 			propertyTracker += 1
 		#add a property for the total non=english speakers 
-		propertiesToAdd["Total Non-English Speakers"] = totalNonEnglish
+		propertiesToAdd["total non-english"] = totalNonEnglish
 
 		
 

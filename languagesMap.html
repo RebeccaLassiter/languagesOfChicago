@@ -21,7 +21,7 @@
     const path = d3.geoPath().projection(myProjection)
 
     //this is the property/language we are looking at
-    var selectedProperty = "Total Non-English Speakers"; 
+    var selectedProperty = "total non-english"; 
     
     //this div will hold the community area names on hover
     var div = d3.select("body").append("div")
@@ -46,6 +46,20 @@
                                             value = total/pop *100;
                                             return value;})]);
               });
+    function mapColors(d){
+      console.log(selectedProperty);
+      total = parseInt(d["properties"][selectedProperty.toLowerCase()], 10); 
+      console.log(total);
+      pop = parseInt(d["properties"]["total population"].replace("\,",""), 10); 
+      value = total/pop *100; 
+      console.log(value);
+      if(color(value) != "rgb(0, 0, 0)"){
+        return color(value);
+      }
+      else{
+        return "#a9a9a9"
+      } //if the data is unavailable                   
+    }
                     
     function drawMap(err, dataSource) {
       if (err) throw err
@@ -64,15 +78,7 @@
         .attr("d", path)
 
         //changes the color of each community area
-        .style('fill', function(d) {
-                          total = parseInt(d["properties"][selectedProperty], 10); 
-                          pop = parseInt(d["properties"]["total population"].replace("\,",""), 10); 
-                          value = total/pop *100; 
-                          if(color(value) != "rgb(0, 0, 0)"){
-                            return color(value);
-                          }
-                          else{return "#a9a9a9"} //if the data is unavailable
-                          })
+        .style('fill', function(d){return mapColors(d)})
 
         //displays the community area name on hover
         .on('mouseover', function (d, i) {
@@ -130,9 +136,10 @@
     }
     function updateMap(){
       console.log("in update map");
-
-       svg.selectAll('path')
-       .style('fill', 'red'); 
+      console.log(selectedProperty);
+      d3.json("langAndGeography.geojson", drawMap);
+      // svg.selectAll('path')
+      //    .style('fill', function(d){return mapColors(d);}); 
 
     }
 
