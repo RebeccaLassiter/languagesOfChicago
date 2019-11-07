@@ -22,9 +22,9 @@ with open('languageAndPop.csv', newline='') as csvfile:
      	##build up the properties dict you want to add to geojson (converting row to geojson)
 		for entry in row:
      		##gets the column headers and assign them the associated row value
-			columnName = header[propertyTracker].lower()
+			columnName = header[propertyTracker].lower().strip('\n')
      		#adding each column value to properties
-			propertiesToAdd[columnName] = entry.lower()
+			propertiesToAdd[columnName] = entry.lower().strip('\"').strip()
 			#only want to add up the columns with language counts
 			if(propertyTracker > 2 and propertyTracker < len(row) - 1):
 				totalNonEnglish += int(entry)
@@ -37,13 +37,15 @@ with open('languageAndPop.csv', newline='') as csvfile:
 		for communityArea in features: 
 			properties = communityArea['properties']
 			#find the matching community area
-			if properties['community'] == row[1].upper():
+			
+			if properties['community'].replace("\'", "") == row[1].replace("\'", "").upper():
 				#combine the new and old properties and reassign it
 				properties = dict(list(properties.items()) + list(propertiesToAdd.items()))
 				communityArea['properties'] = properties
+			
 
 
 gj['features'] = features
-with open('langAndGeography.geojson', 'w') as f:
+with open('../langAndGeography.geojson', 'w') as f:
     json.dump(gj, f)
 

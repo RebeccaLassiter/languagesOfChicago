@@ -21,7 +21,7 @@
     const path = d3.geoPath().projection(myProjection)
 
     //this is the property/language we are looking at
-    var selectedProperty = "african languages";//"Total Non-English Speakers"; 
+    var selectedProperty = "Total Non-English Speakers"; 
     
     //this div will hold the community area names on hover
     var div = d3.select("body").append("div")
@@ -36,13 +36,15 @@
     d3.json("langAndGeography.geojson", function(data){
                 data = data.features;
                 color.domain([ d3.min(data, function(d){ 
-                                            pop = d["properties"]["total population"];
-                                            total = d["properties"][selectedProperty];
-                                            return total/pop;}),
+                                            total = parseInt(d["properties"][selectedProperty], 10); 
+                                            pop = parseInt(d["properties"]["total population"].replace("\,",""), 10); 
+                                            value = total/pop *100;
+                                            return value;}),
                                d3.max(data, function(d){
-                                            pop = d["properties"]["total population"];
-                                            total = d["properties"][selectedProperty];
-                                            return total/pop;})]);
+                                            total = parseInt(d["properties"][selectedProperty], 10); 
+                                            pop = parseInt(d["properties"]["total population"].replace("\,",""), 10); 
+                                            value = total/pop *100;
+                                            return value;})]);
               });
                     
     function drawMap(err, dataSource) {
@@ -63,9 +65,9 @@
 
         //changes the color of each community area
         .style('fill', function(d) {
-                          total = d["properties"][selectedProperty]; 
-                          pop = d["properties"]["total population"]; 
-                          value = total/pop; 
+                          total = parseInt(d["properties"][selectedProperty], 10); 
+                          pop = parseInt(d["properties"]["total population"].replace("\,",""), 10); 
+                          value = total/pop *100; 
                           if(color(value) != "rgb(0, 0, 0)"){
                             return color(value);
                           }
@@ -84,10 +86,10 @@
 
           //gets the community name and adds it to the div
           name = d.properties.community;
-          total = d.properties[selectedProperty];
-          pop = d.properties["total population"]; 
-          value = total/pop; 
-          div.html(name+" " + value)
+          total = parseInt(d["properties"][selectedProperty], 10); 
+          pop = parseInt(d["properties"]["total population"].replace("\,",""), 10); 
+          value = total/pop *100;
+          div.html(name+" " + value + "%")
                .style("left", (d3.event.pageX + 10) + "px")
                .style("top", (d3.event.pageY - 15) + "px");
           
