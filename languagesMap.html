@@ -48,7 +48,7 @@
               });
     function mapColors(d){
       console.log(selectedProperty);
-      total = parseInt(d["properties"][selectedProperty.toLowerCase()], 10); 
+      total = parseInt(d["properties"][selectedProperty], 10); 
       console.log(total);
       pop = parseInt(d["properties"]["total population"].replace("\,",""), 10); 
       value = total/pop *100; 
@@ -128,18 +128,27 @@
 
       //when users select a lang from the dropdown
         d3.select("#langDropdown")
-          .on("change", function(d) {
-            selectedProperty = this.value;
-            updateMap();
+          .on('change', function(d) {
+            console.log("changing")
+            selectedProperty = this.value.toLowerCase();
+            svg.selectAll('g')
+              .selectAll('path')
+             .style('fill', function(d){
+                    console.log("d is" +d );
+                    //return "red";});
+                    return mapColors(d);}); 
+           // updateMap();
             });
 
     }
     function updateMap(){
       console.log("in update map");
       console.log(selectedProperty);
-      d3.json("langAndGeography.geojson", drawMap);
-      // svg.selectAll('path')
-      //    .style('fill', function(d){return mapColors(d);}); 
+      //d3.json("langAndGeography.geojson", drawMap);
+      svg.selectAll('path')
+         .style('fill', function(d){
+          console.log("d is" +d );
+          return mapColors(d);}); 
 
     }
 
