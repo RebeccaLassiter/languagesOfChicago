@@ -155,11 +155,20 @@
           .attr("stop-color", d => color(d));
 
       d3.select("g").append("rect")
-          .attr("width", 400)
-          .attr("height", 50)
+          .attr("width", 200)
+          .attr("height", 25)
           .attr("x", 500)
           .attr("y", 120)
           .style("fill", "url(#myGradient)");
+
+      d3.select("g").append("text")
+          .attr("x", 500)
+          .attr("y", 160)
+          .text(legendIntervals[0]);
+       d3.select("g").append("text")
+          .attr("x", 700)
+          .attr("y", 160)
+          .text(legendIntervals[5]);
 
 
       // var legend = svg.selectAll("g.legend")
