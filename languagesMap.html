@@ -64,10 +64,17 @@
 
     function updateMap(dataSource){
           updateDomain(dataSource);
+          updateLegend(); 
           svg.selectAll('g')
              .selectAll('path')
              .style('fill', function(d){
                               return mapColors(d);}); 
+    }
+    function updateLegend(){
+        d3.select("#labelLow")
+          .text(color.domain()[0] + "%");
+        d3.select("#labelHigh")
+          .text(color.domain()[1] + "%");
     }
                     
     function drawMap(err, dataSource) {
@@ -162,35 +169,15 @@
           .style("fill", "url(#myGradient)");
 
       d3.select("g").append("text")
+          .attr("id", "labelLow")
           .attr("x", 500)
           .attr("y", 160)
-          .text(legendIntervals[0]);
+          .text(legendIntervals[0] + "%");
        d3.select("g").append("text")
+          .attr("id","labelHigh")
           .attr("x", 700)
           .attr("y", 160)
-          .text(legendIntervals[5]);
-
-
-      // var legend = svg.selectAll("g.legend")
-      // .data(legendIntervals)
-      // .enter().append("g")
-      // .attr("class", "legend");
-
-      // var ls_w = 20, ls_h = 20;
-
-      // legend.append("rect")
-      // .attr("x", 500)
-      // .attr("y", 100)//function(d, i){ return height - (i*ls_h) - 2*ls_h;})
-      // .attr("width", 20)
-      // .attr("height", ls_h)
-      // .style("fill", function(d, i) {console.log(d); return color(d); })
-      // //.style("opacity", 0.8);
-
-      // legend.append("text")
-      // .attr("x", 500)
-      // .attr("y", 120)//function(d, i){ return height - (i*ls_h) - ls_h - 4;})
-      // .text(color.domain());//function(d, i){ return legend_labels[i]; });
-
+          .text(legendIntervals[5] + "%");
     }
 
     //this will call drawMap() function and give it the communityAreas data
