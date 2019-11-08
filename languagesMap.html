@@ -12,6 +12,7 @@
   <svg width="960" height="600"></svg>
   <script>
     var languageCategories = ["Total Non-English","AFRICAN LANGUAGES","ARABIC","ARMENIAN","CAMBODIAN (MON-KHMER)","CHINESE","CREOLE","FRENCH","GERMAN","GREEK","GUJARATI","HEBREW","HINDI","HMONG","HUNGARIAN","ITALIAN","JAPANESE","KOREAN","LAOTIAN","NAVAJO","OTHER ASIAN","OTHER INDIC","OTHER INDO EURPOEAN","OTHER NATIVE NORTH AMERICAN","OTHER PACIFIC ISLAND","OTHER SLAVIC","OTHER WEST GERMANIC","PERSIAN","POLISH","PORTUGUESE","RUSSIAN","SCANDINAVIAN","SERBO-CROATIAN","SPANISH","TAGALOG","THAI","UNSPECIFIED","URDU","VIETNAMESE","YIDDISH"];
+    var newDomain; 
     const svg = d3.select("svg")
     const myProjection = d3.geoMercator()
                             .center([-87.5,41.85])
@@ -27,32 +28,40 @@
     var div = d3.select("body").append("div")
      .attr("class", "communityName")
      .style("opacity", 0);
-
-    //setting up the colors of the map
-    var color = d3.scaleLinear()
-          .range(["white", "green"])
-
-    //sets color's domain based on the data we are looking at
-    d3.json("langAndGeography.geojson", function(data){
-                data = data.features;
-                color.domain([ d3.min(data, function(d){ 
-                                            total = parseInt(d["properties"][selectedProperty], 10); 
-                                            pop = parseInt(d["properties"]["total population"].replace("\,",""), 10); 
-                                            value = total/pop *100;
-                                            return value;}),
-                               d3.max(data, function(d){
-                                            total = parseInt(d["properties"][selectedProperty], 10); 
-                                            pop = parseInt(d["properties"]["total population"].replace("\,",""), 10); 
-                                            value = total/pop *100;
-                                            return value;})]);
-              });
+      
+        //setting up the colors of the map
+     var color = d3.scaleLinear()
+      .range(["white", "green"])  
+  
+     
+     function updateDomain(data){
+            console.log(selectedProperty);
+            data = data.features;
+            console.log(data);
+            min = d3.min(data, function(d){ 
+                                        total = parseInt(d["properties"][selectedProperty], 10); 
+                                        pop = parseInt(d["properties"]["total population"].replace("\,",""), 10); 
+                                        value = total/pop *100;
+                                        return value;});
+            max =  d3.max(data, function(d){
+                                        total = parseInt(d["properties"][selectedProperty], 10); 
+                                        pop = parseInt(d["properties"]["total population"].replace("\,",""), 10); 
+                                        value = total/pop *100;
+                                        return value;})
+            console.log(min);
+            console.log(max);
+            var ans = [min, max]; 
+            color.domain([min, max]);
+     }
+     
+   
     function mapColors(d){
-      console.log(selectedProperty);
+
+      //updateDomain()
+      //console.log(color.domain())
       total = parseInt(d["properties"][selectedProperty], 10); 
-      console.log(total);
       pop = parseInt(d["properties"]["total population"].replace("\,",""), 10); 
       value = total/pop *100; 
-      console.log(value);
       if(color(value) != "rgb(0, 0, 0)"){
         return color(value);
       }
@@ -60,10 +69,20 @@
         return "#a9a9a9"
       } //if the data is unavailable                   
     }
+
+    function updateMap(dataSource){
+          updateDomain(dataSource);
+          console.log("domain we just updated, haven't updated map colors yet")
+          console.log(color.domain())
+          svg.selectAll('g')
+             .selectAll('path')
+             .style('fill', function(d){
+
+                              return mapColors(d);}); 
+    }
                     
     function drawMap(err, dataSource) {
       if (err) throw err
-
 
       //giving path the foreground class
       svg.append("path")
@@ -129,33 +148,14 @@
       //when users select a lang from the dropdown
         d3.select("#langDropdown")
           .on('change', function(d) {
-            console.log("changing")
             selectedProperty = this.value.toLowerCase();
-            svg.selectAll('g')
-              .selectAll('path')
-             .style('fill', function(d){
-                    console.log("d is" +d );
-                    //return "red";});
-                    return mapColors(d);}); 
-           // updateMap();
+            updateMap(dataSource);
             });
-
-    }
-    function updateMap(){
-      console.log("in update map");
-      console.log(selectedProperty);
-      //d3.json("langAndGeography.geojson", drawMap);
-      svg.selectAll('path')
-         .style('fill', function(d){
-          console.log("d is" +d );
-          return mapColors(d);}); 
 
     }
 
     //this will call drawMap() function and give it the communityAreas data
     d3.json("langAndGeography.geojson", drawMap)
-  // update();
-
 
   </script>
 </body>
