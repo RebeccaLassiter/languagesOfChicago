@@ -21,7 +21,7 @@
     //path is like our main map group
     const path = d3.geoPath().projection(myProjection)
 
-    //this is the property/language we are looking at
+    //this is the property/language we are looking at. default to total
     var selectedProperty = "total non-english"; 
     
     //this div will hold the community area names on hover
@@ -35,9 +35,7 @@
   
      
      function updateDomain(data){
-            console.log(selectedProperty);
             data = data.features;
-            console.log(data);
             min = d3.min(data, function(d){ 
                                         total = parseInt(d["properties"][selectedProperty], 10); 
                                         pop = parseInt(d["properties"]["total population"].replace("\,",""), 10); 
@@ -48,17 +46,11 @@
                                         pop = parseInt(d["properties"]["total population"].replace("\,",""), 10); 
                                         value = total/pop *100;
                                         return value;})
-            console.log(min);
-            console.log(max);
-            var ans = [min, max]; 
-            color.domain([min, max]);
+            color.domain([0, max]);
      }
      
    
     function mapColors(d){
-
-      //updateDomain()
-      //console.log(color.domain())
       total = parseInt(d["properties"][selectedProperty], 10); 
       pop = parseInt(d["properties"]["total population"].replace("\,",""), 10); 
       value = total/pop *100; 
@@ -72,18 +64,15 @@
 
     function updateMap(dataSource){
           updateDomain(dataSource);
-          console.log("domain we just updated, haven't updated map colors yet")
-          console.log(color.domain())
           svg.selectAll('g')
              .selectAll('path')
              .style('fill', function(d){
-
                               return mapColors(d);}); 
     }
                     
     function drawMap(err, dataSource) {
       if (err) throw err
-
+      updateDomain(dataSource);
       //giving path the foreground class
       svg.append("path")
         .attr("class", "foreground")
@@ -151,6 +140,47 @@
             selectedProperty = this.value.toLowerCase();
             updateMap(dataSource);
             });
+
+      //legend
+      var domain = color.domain()[1]
+      var legendIntervals = [0, domain*.2, domain*.4, domain*.6, domain*.8, domain]
+      var extent = d3.extent(legendIntervals, d => d);
+
+      var defs = svg.append("defs");
+      var linearGradient = defs.append("linearGradient").attr("id", "myGradient");
+      linearGradient.selectAll("stop")
+          .data(legendIntervals)
+        .enter().append("stop")
+          .attr("offset", d => ((d - extent[0]) / (extent[1] - extent[0]) * 100) + "%")
+          .attr("stop-color", d => color(d));
+
+      d3.select("g").append("rect")
+          .attr("width", 400)
+          .attr("height", 50)
+          .attr("x", 500)
+          .attr("y", 120)
+          .style("fill", "url(#myGradient)");
+
+
+      // var legend = svg.selectAll("g.legend")
+      // .data(legendIntervals)
+      // .enter().append("g")
+      // .attr("class", "legend");
+
+      // var ls_w = 20, ls_h = 20;
+
+      // legend.append("rect")
+      // .attr("x", 500)
+      // .attr("y", 100)//function(d, i){ return height - (i*ls_h) - 2*ls_h;})
+      // .attr("width", 20)
+      // .attr("height", ls_h)
+      // .style("fill", function(d, i) {console.log(d); return color(d); })
+      // //.style("opacity", 0.8);
+
+      // legend.append("text")
+      // .attr("x", 500)
+      // .attr("y", 120)//function(d, i){ return height - (i*ls_h) - ls_h - 4;})
+      // .text(color.domain());//function(d, i){ return legend_labels[i]; });
 
     }
 
