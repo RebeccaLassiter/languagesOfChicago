@@ -201,13 +201,26 @@
     }
 
     function prominentLang(){
-      console.log("prom");
-      d3.selectAll("button")
-        .html("View All Languages");
+    
+      hideSidebars1();
+
       svg.selectAll('g')
              .selectAll('path')
              .style('fill', function(d){
                               return 'red';});
+    }
+
+    function hideSidebars1(){
+      d3.selectAll("button")
+        .html("View All Languages");
+      d3.selectAll("defs")
+        .style("display", "none");
+      d3.selectAll("g")
+        .selectAll("text")
+        .style("display", "none");
+
+      d3.select("#langDropdown")
+        .style("display", "none");  
     }
 
     //this will call drawMap() function and give it the communityAreas data
