@@ -18,6 +18,11 @@ div.communityName {
  pointer-events: none;
  font-size: 1.3rem;
 }
+.prominentButton{
+	position: absolute;
+	left: 500px;
+	top: 200px;
+}
 
 
 select { position: absolute; left: 500px; top: 50px; }
