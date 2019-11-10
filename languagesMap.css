@@ -34,6 +34,14 @@ div.communityName {
 	top: 150px;
 }
 
+#title{
+	position: absolute;
+	left: 25px;
+	top: 25px;
+	font-size: larger;
+
+}
+
 
 select { position: absolute; left: 500px; top: 50px; }
 p { position: absolute; left: 280px; top: 32px; }

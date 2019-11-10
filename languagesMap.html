@@ -29,6 +29,11 @@
      .attr("class", "communityName")
      .style("opacity", 0);
 
+    //title
+    d3.select("body").append("div")
+     .attr("id", "title")
+     .html("Percentage of a Given Language Spoken In Chicago");
+
      //this div will hold the ordinal legend
      d3.select("body").append("div")
        .attr("id", "ordinalLegend")
@@ -302,6 +307,9 @@
     function hideSidebars2(){
       d3.selectAll("#allLangButton")
         .style("display", "none")
+
+      d3.selectAll("#ordinalLegend")
+        .style("display", "none")
     }
 
 
@@ -317,6 +325,8 @@
 
       d3.selectAll("#ordinalLegend")
         .style("display", "inline")
+      d3.select("#title")
+        .html("Predominant Non-English Languages");
     }
     function showSidebars1(){
       d3.selectAll("#prominentButton")
@@ -329,6 +339,8 @@
 
       d3.select("#langDropdown")
         .style("display", "inline"); 
+      d3.select("#title")
+        .html("Percentage of a Given Language Spoken In Chicago");
     }
 
     //this will call drawMap() function and give it the communityAreas data
