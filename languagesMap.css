@@ -18,7 +18,12 @@ div.communityName {
  pointer-events: none;
  font-size: 1.3rem;
 }
-.prominentButton{
+#prominentButton{
+	position: absolute;
+	left: 500px;
+	top: 200px;
+}
+#allLangButton{
 	position: absolute;
 	left: 500px;
 	top: 200px;

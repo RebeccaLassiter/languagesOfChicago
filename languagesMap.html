@@ -29,19 +29,33 @@
      .attr("class", "communityName")
      .style("opacity", 0);
 
-           //button to view most prominent langs
-      d3.select("body").append("button")
-        .attr("type", "button")
-        .attr("class", "prominentButton")
-        .html("View Most Prominent Non-English Language")
-        .on("click", prominentLang);
-        //.attr("value", "button7");
-      
-        //setting up the colors of the map
+             //setting up the colors of the map
      var color = d3.scaleLinear()
       .range(["white", "green"])  
   
      
+
+
+    function createButtons(dataSource){
+      
+      //button to view most prominent langs
+      d3.select("body").append("button")
+        .attr("type", "button")
+        .attr("id", "prominentButton")
+        .html("View Most Prominent Non-English Language")
+        .on("click", function(){prominentLang(dataSource)});
+
+        //button to go back to original view
+      d3.select("body").append("button")
+        .attr("type", "button")
+        .attr("id", "allLangButton")
+        .html("View All Languages")
+        .style("display", "none")
+        .on("click", function(){allLang(dataSource)});
+    } 
+    
+
+
      function updateDomain(data){
             data = data.features;
             min = d3.min(data, function(d){ 
@@ -136,8 +150,12 @@
 
         });
 
+
+
         dropDown(dataSource);
         gradientLegend(dataSource); 
+        createButtons(dataSource);
+ 
 
 
     }
@@ -200,19 +218,40 @@
           .text(legendIntervals[5] + "%");
     }
 
-    function prominentLang(){
-    
+    function prominentLang(dataSource){
+      console.log("in prom");
       hideSidebars1();
-
+      showSidebars2();
       svg.selectAll('g')
              .selectAll('path')
              .style('fill', function(d){
-                              return 'red';});
+                              return predominentLangColors(d);});
     }
 
+    function predominentLangColors(d){
+      lang = d["properties"]["predominant non-english language (%)"];
+      if(lang.includes("spanish")){
+        return "#a6cee3";
+      }
+      else if(lang.includes("chinese")){
+        return "#1f78b4";
+      }
+      else if(lang.includes("polish")){
+        return '#b2df8a';
+      }
+      else if(lang.includes("african languages")){
+        return "#33a02c";
+      }
+      else{
+        return "#a9a9a9"; //unhandled case
+      }
+
+    }
+
+
     function hideSidebars1(){
-      d3.selectAll("button")
-        .html("View All Languages");
+      d3.selectAll("#prominentButton")
+        .style("display", "none"); 
       d3.selectAll("defs")
         .style("display", "none");
       d3.selectAll("g")
@@ -221,6 +260,34 @@
 
       d3.select("#langDropdown")
         .style("display", "none");  
+    }
+    function hideSidebars2(){
+      d3.selectAll("#allLangButton")
+        .style("display", "none")
+    }
+
+
+    //reverts back to the original display
+    function allLang(dataSource){
+      hideSidebars2();
+      showSidebars1(); 
+      updateMap(dataSource);
+    }
+    function showSidebars2(){
+      d3.selectAll("#allLangButton")
+        .style("display", "inline")
+    }
+    function showSidebars1(){
+      d3.selectAll("#prominentButton")
+        .style("display", "inline"); 
+      d3.selectAll("defs")
+        .style("display", "inline");
+      d3.selectAll("g")
+        .selectAll("text")
+        .style("display", "inline");
+
+      d3.select("#langDropdown")
+        .style("display", "inline"); 
     }
 
     //this will call drawMap() function and give it the communityAreas data
