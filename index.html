@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Languages of Chicago</title>
+  <meta charset="utf-8">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+   <link rel="stylesheet" type="text/css" href="languagesMap.css">
+</head>
+
+<body>
+  <svg width="960" height="600"></svg>
+  <script>
+    var languageCategories = ["Total Non-English","AFRICAN LANGUAGES","ARABIC","ARMENIAN","CAMBODIAN (MON-KHMER)","CHINESE","CREOLE","FRENCH","GERMAN","GREEK","GUJARATI","HEBREW","HINDI","HMONG","HUNGARIAN","ITALIAN","JAPANESE","KOREAN","LAOTIAN","NAVAJO","OTHER ASIAN","OTHER INDIC","OTHER INDO EURPOEAN","OTHER NATIVE NORTH AMERICAN","OTHER PACIFIC ISLAND","OTHER SLAVIC","OTHER WEST GERMANIC","PERSIAN","POLISH","PORTUGUESE","RUSSIAN","SCANDINAVIAN","SERBO-CROATIAN","SPANISH","TAGALOG","THAI","UNSPECIFIED","URDU","VIETNAMESE","YIDDISH"];
+    var newDomain; 
+    const svg = d3.select("svg")
+    const myProjection = d3.geoMercator()
+                            .center([-87.5,41.85])
+                            .scale( 50000 )
+
+    //path is like our main map group
+    const path = d3.geoPath().projection(myProjection)
+
+    //this is the property/language we are looking at. default to total
+    var selectedProperty = "total non-english"; 
+    
+    //this div will hold the community area names on hover
+    var div = d3.select("body").append("div")
+     .attr("class", "communityName")
+     .style("z-index", 100)
+     .style("opacity", 0);
+
+    //title
+    d3.select("body").append("div")
+     .attr("id", "title")
+     .html("Percentage of a Given Language Spoken In Chicago");
+
+     //this div will hold the ordinal legend
+     d3.select("body").append("div")
+       .attr("id", "ordinalLegend")
+       .style("display", "none");
+
+    //setting up the colors of the map
+     var color = d3.scaleLinear()
+      .range(["white", "green"])  
+  
+     
+
+
+    function createButtons(dataSource){
+
+      //button to view most prominent langs
+      d3.select("body").append("button")
+        .attr("type", "button")
+        .attr("id", "prominentButton")
+        .html("View Most Prominent Non-English Language")
+        .on("click", function(){prominentLang(dataSource)});
+
+        //button to go back to original view
+      d3.select("body").append("button")
+        .attr("type", "button")
+        .attr("id", "allLangButton")
+        .html("View All Languages")
+        .style("display", "none")
+        .on("click", function(){allLang(dataSource)});
+    } 
+    
+
+
+     function updateDomain(data){
+            data = data.features;
+            min = d3.min(data, function(d){ 
+                                        total = parseInt(d["properties"][selectedProperty], 10); 
+                                        pop = parseInt(d["properties"]["total population"].replace("\,",""), 10); 
+                                        value = total/pop *100;
+                                        return value;});
+            max =  d3.max(data, function(d){
+                                        total = parseInt(d["properties"][selectedProperty], 10); 
+                                        pop = parseInt(d["properties"]["total population"].replace("\,",""), 10); 
+                                        value = total/pop *100;
+                                        return value;}).toFixed(4);
+            color.domain([0, max]);
+     }
+     
+   
+    function mapColors(d){
+      total = parseInt(d["properties"][selectedProperty], 10); 
+      pop = parseInt(d["properties"]["total population"].replace("\,",""), 10); 
+      value = total/pop *100; 
+      if(color(value) != "rgb(0, 0, 0)"){
+        return color(value);
+      }
+      else{
+        return "#a9a9a9"
+      } //if the data is unavailable                   
+    }
+
+    function updateMap(dataSource){
+          updateDomain(dataSource);
+          updateLegend(); 
+          svg.selectAll('g')
+             .selectAll('path')
+             .style('fill', function(d){
+                              return mapColors(d);}); 
+    }
+    function updateLegend(){
+        d3.select("#labelLow")
+          .text(color.domain()[0] + "%");
+        d3.select("#labelHigh")
+          .text(color.domain()[1] + "%");
+    }
+                    
+    function drawMap(err, dataSource) {
+      if (err) throw err
+      updateDomain(dataSource);
+      //giving path the foreground class
+      svg.append("path")
+        .attr("class", "foreground")
+        .attr("d", path);
+
+      //adding a group element and assigning it the data and path
+      svg.append("g")
+        .selectAll("path")
+        .data(dataSource.features)
+        .enter().append("path")
+        .attr("d", path)
+
+        //changes the color of each community area
+        .style('fill', function(d){return mapColors(d)})
+
+        //displays the community area name on hover
+        .on('mouseover', function (d, i) {
+          d3.select(this).transition()
+               .duration('50')
+               .attr('opacity', '.85');
+
+          div.transition()
+               .duration(50)
+               .style("opacity", 1);
+
+          //gets the community name and adds it to the div
+          name = d.properties.community;
+          total = parseInt(d["properties"][selectedProperty], 10); 
+          pop = parseInt(d["properties"]["total population"].replace("\,",""), 10); 
+          value = (total/pop *100).toFixed(4);
+          div.html(name+" " + value + "%")
+               .style("left", (d3.event.pageX + 10) + "px")
+               .style("top", (d3.event.pageY - 15) + "px");
+          
+        })
+
+        //removes community area name
+        .on('mouseout', function (d, i) {
+          d3.select(this).transition()
+               .duration('50')
+               .attr('opacity', '1');
+          //makes the div disappear
+          div.transition()
+               .duration('50')
+               .style("opacity", 0);
+
+        });
+
+
+
+        dropDown(dataSource);
+        gradientLegend(dataSource); 
+        ordinalLegend()
+        createButtons(dataSource);
+ 
+
+
+    }
+
+    function dropDown(dataSource){
+                  //creates the dropdown with the language options
+       d3.select("body")
+          .append("select")
+          .attr("id", "langDropdown");
+          
+      //adds all the options to the dropdown
+        d3.selectAll("select")
+          .selectAll("option")
+          .data(languageCategories)
+          .enter().append("option")
+          .text(function(d){
+                  return d;
+          });
+
+      //when users select a lang from the dropdown
+        d3.select("#langDropdown")
+          .on('change', function(d) {
+            selectedProperty = this.value.toLowerCase();
+            updateMap(dataSource);
+            });
+    }
+
+    function gradientLegend(dataSource){
+
+
+      //legend
+      var domain = color.domain()[1]
+      var legendIntervals = [0, domain*.2, domain*.4, domain*.6, domain*.8, domain]
+      var extent = d3.extent(legendIntervals, d => d);
+
+      var defs = svg.append("defs");
+      var linearGradient = defs.append("linearGradient").attr("id", "myGradient");
+      linearGradient.selectAll("stop")
+          .data(legendIntervals)
+        .enter().append("stop")
+          .attr("offset", d => ((d - extent[0]) / (extent[1] - extent[0]) * 100) + "%")
+          .attr("stop-color", d => color(d));
+
+      d3.select("g").append("rect")
+          .attr("width", 200)
+          .attr("height", 25)
+          .attr("x", 500)
+          .attr("y", 120)
+          .style("fill", "url(#myGradient)");
+
+      d3.select("g").append("text")
+          .attr("id", "labelLow")
+          .attr("x", 500)
+          .attr("y", 160)
+          .text(legendIntervals[0] + "%");
+      d3.select("g").append("text")
+          .attr("id","labelHigh")
+          .attr("x", 700)
+          .attr("y", 160)
+          .text(legendIntervals[5] + "%");
+    }
+
+    function ordinalLegend(){
+        d3.selectAll("#ordinalLegend")
+          .append("div")
+          .attr("id", "legendRow1")
+          .style("padding", "10px")
+          .append("div")
+          .style("background-color", "#a6cee3")
+          .style("height", "15px")
+          .style("width", "15px")
+          .style("float", "left");
+        d3.selectAll("#legendRow1")
+          .append("text")
+          .text("Spanish")
+          .style("float", "right")
+          .style("padding-left", "5px");
+
+        d3.selectAll("#ordinalLegend")
+          .append("div")
+          .attr("id", "legendRow2")
+          .style("padding", "10px")
+          .append("div")
+          .style("background-color", "#1f78b4")
+          .style("height", "15px")
+          .style("width", "15px")
+          .style("float", "left");
+        d3.selectAll("#legendRow2")
+          .append("text")
+          .text("Chinese")
+          .style("padding-left", "5px")
+          .style("float", "right");
+
+
+        d3.selectAll("#ordinalLegend")
+          .append("div")
+          .attr("id", "legendRow3")
+          .style("padding", "10px")
+          .append("div")
+          .style("background-color", "#b2df8a")
+          .style("height", "15px")
+          .style("width", "15px")
+          .style("float", "left");
+        d3.selectAll("#legendRow3")
+          .append("text")
+          .text("Polish")
+          .style("padding-left", "5px")
+          .style("float", "right");
+
+        d3.selectAll("#ordinalLegend")
+          .append("div")
+          .attr("id", "legendRow4")
+          .style("padding", "10px")
+          .append("div")
+          .style("background-color", "#33a02c")
+          .style("height", "15px")
+          .style("width", "15px")
+          .style("float", "left");
+        d3.selectAll("#legendRow4")
+          .append("text")
+          .text("African Languages")
+          .style("padding-left", "5px")
+          .style("float", "right");
+
+    }
+
+    function prominentLang(dataSource){
+      console.log("in prom");
+      hideSidebars1();
+      showSidebars2();
+      svg.selectAll('g')
+             .selectAll('path')
+             .style('fill', function(d){
+                              return predominentLangColors(d);});
+    }
+
+    function predominentLangColors(d){
+      lang = d["properties"]["predominant non-english language (%)"];
+      if(lang.includes("spanish")){
+        return "#a6cee3";
+      }
+      else if(lang.includes("chinese")){
+        return "#1f78b4";
+      }
+      else if(lang.includes("polish")){
+        return '#b2df8a';
+      }
+      else if(lang.includes("african languages")){
+        return "#33a02c";
+      }
+      else{
+        return "#a9a9a9"; //unhandled case
+      }
+
+    }
+
+
+    function hideSidebars1(){
+      d3.selectAll("#prominentButton")
+        .style("display", "none"); 
+      d3.selectAll("defs")
+        .style("display", "none");
+      d3.selectAll("g")
+        .selectAll("text")
+        .style("display", "none");
+
+      d3.select("#langDropdown")
+        .style("display", "none");  
+    }
+    function hideSidebars2(){
+      d3.selectAll("#allLangButton")
+        .style("display", "none")
+
+      d3.selectAll("#ordinalLegend")
+        .style("display", "none")
+    }
+
+
+    //reverts back to the original display
+    function allLang(dataSource){
+      hideSidebars2();
+      showSidebars1(); 
+      updateMap(dataSource);
+    }
+    function showSidebars2(){
+      d3.selectAll("#allLangButton")
+        .style("display", "inline")
+
+      d3.selectAll("#ordinalLegend")
+        .style("display", "inline")
+      d3.select("#title")
+        .html("Predominant Non-English Languages");
+    }
+    function showSidebars1(){
+      d3.selectAll("#prominentButton")
+        .style("display", "inline"); 
+      d3.selectAll("defs")
+        .style("display", "inline");
+      d3.selectAll("g")
+        .selectAll("text")
+        .style("display", "inline");
+
+      d3.select("#langDropdown")
+        .style("display", "inline"); 
+      d3.select("#title")
+        .html("Percentage of a Given Language Spoken In Chicago");
+    }
+
+    //this will call drawMap() function and give it the communityAreas data
+    d3.json("langAndGeography.geojson", drawMap)
+
+  </script>
+</body>
+
+</html>
