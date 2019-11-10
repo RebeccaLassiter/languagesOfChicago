@@ -29,7 +29,12 @@
      .attr("class", "communityName")
      .style("opacity", 0);
 
-             //setting up the colors of the map
+     //this div will hold the ordinal legend
+     d3.select("body").append("div")
+       .attr("id", "ordinalLegend")
+       .style("display", "none");
+
+    //setting up the colors of the map
      var color = d3.scaleLinear()
       .range(["white", "green"])  
   
@@ -37,7 +42,7 @@
 
 
     function createButtons(dataSource){
-      
+
       //button to view most prominent langs
       d3.select("body").append("button")
         .attr("type", "button")
@@ -154,6 +159,7 @@
 
         dropDown(dataSource);
         gradientLegend(dataSource); 
+        ordinalLegend()
         createButtons(dataSource);
  
 
@@ -218,6 +224,38 @@
           .text(legendIntervals[5] + "%");
     }
 
+    function ordinalLegend(){
+        d3.selectAll("#ordinalLegend")
+          .attr("width", 200)
+          .attr("height", 25)
+          .append("rect")
+          .html("Spanish")
+          .style("background-color", "#a6cee3");
+
+        d3.selectAll("#ordinalLegend")
+          .attr("width", 200)
+          .attr("height", 25)
+          .append("rect")
+          .html("Chinese")
+          .style("background-color", "#1f78b4");
+
+        d3.selectAll("#ordinalLegend")
+          .attr("width", 200)
+          .attr("height", 25)
+          .append("rect")
+          .html("Polish")
+          .style("background-color", "#b2df8a");
+
+
+        d3.selectAll("#ordinalLegend")
+          .attr("width", 200)
+          .attr("height", 25)
+          .append("rect")
+          .html("African Languages")
+          .style("background-color", "#33a02c");
+
+    }
+
     function prominentLang(dataSource){
       console.log("in prom");
       hideSidebars1();
@@ -275,6 +313,9 @@
     }
     function showSidebars2(){
       d3.selectAll("#allLangButton")
+        .style("display", "inline")
+
+      d3.selectAll("#ordinalLegend")
         .style("display", "inline")
     }
     function showSidebars1(){

@@ -28,6 +28,11 @@ div.communityName {
 	left: 500px;
 	top: 200px;
 }
+#ordinalLegend{
+	position: absolute;
+	left: 500px;
+	top: 150px;
+}
 
 
 select { position: absolute; left: 500px; top: 50px; }
